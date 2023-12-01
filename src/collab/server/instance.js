@@ -1,4 +1,3 @@
-const {readFileSync, writeFile} = require("fs");
 const {schema} = require("../schema");
 const db = require('./db');
 
@@ -149,7 +148,7 @@ async function getInstance(id, ip) {
 }
 exports.getInstance = getInstance
 
-async function newInstance(id, doc) {
+async function newInstance(id) {
   if (++instanceCount > maxCount) {
     let oldest = null
     for (let id in instances) {
@@ -160,12 +159,13 @@ async function newInstance(id, doc) {
     delete instances[oldest.id]
     --instanceCount
   }
-  console.log('== id ==', id);
-  const result = await db().collection('entity').find({ _id: 'xAzPkcMqtj2QiJRfS' }).toArray();
 
-  // console.log('== result ==', result);
+  // TODO: handle properly
+  const result = await db().collection('entity')
+      .findOne({ _id: id }, { projection: { 'meta.descriptionMeta.doc': 1, } });
+  const doc = result?.meta.descriptionMeta?.doc;
 
-  return instances[id] = await new Instance(id, doc);
+  return instances[id] = await new Instance(id, schema.nodeFromJSON(doc));
 }
 
 function instanceInfo() {
