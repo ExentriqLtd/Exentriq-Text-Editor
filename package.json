@@ -1,0 +1,65 @@
+{
+  "name": "text-editor",
+  "private": true,
+  "scripts": {
+    "start": "meteor run",
+    "test": "meteor test --once --driver-package meteortesting:mocha",
+    "test-app": "TEST_WATCH=1 meteor test --full-app --driver-package meteortesting:mocha",
+    "visualize": "meteor --production --extra-packages bundle-visualizer",
+    "start_server": "node src/collab/server/start.js",
+    "devserver": "node src/devserver.js"
+  },
+  "dependencies": {
+    "@babel/runtime": "^7.17.9",
+    "@codemirror/commands": "^6.0.0",
+    "@codemirror/lang-javascript": "^6.0.0",
+    "@codemirror/language": "^6.0.0",
+    "@codemirror/view": "^6.0.0",
+    "@lezer/highlight": "^1.0.0",
+    "@lezer/html": "^1.0.0",
+    "@lezer/javascript": "^1.0.0",
+    "cors": "^2.8.5",
+    "crelt": "^1.0.0",
+    "express": "^4.18.2",
+    "jquery": "^3.6.0",
+    "meteor-node-stubs": "^1.2.1",
+    "prosemirror-collab": "^1.0.0",
+    "prosemirror-commands": "^1.0.0",
+    "prosemirror-example-setup": "^1.0.0",
+    "prosemirror-gapcursor": "^1.0.0",
+    "prosemirror-history": "^1.0.0",
+    "prosemirror-inputrules": "^1.0.0",
+    "prosemirror-keymap": "^1.0.0",
+    "prosemirror-markdown": "^1.0.0",
+    "prosemirror-menu": "^1.0.0",
+    "prosemirror-model": "^1.0.0",
+    "prosemirror-schema-basic": "^1.0.0",
+    "prosemirror-schema-list": "^1.0.0",
+    "prosemirror-state": "^1.0.0",
+    "prosemirror-transform": "^1.0.0",
+    "prosemirror-view": "^1.0.0"
+  },
+  "devDependencies": {
+    "@rollup/plugin-commonjs": "^15.0.0",
+    "@rollup/plugin-json": "^4.1.0",
+    "@rollup/plugin-node-resolve": "^9.0.0",
+    "builddocs": "^1.0.6",
+    "getdocs-ts": "^0.1.2",
+    "markdown-it": "^12.0.0",
+    "markdown-it-deflist": "^2.1.0",
+    "moduleserve": "^0.8.0",
+    "mold-template": "^2.0.0",
+    "punycode": "^1.4.0",
+    "rollup": "^2.26.3",
+    "rollup-plugin-terser": "^7.0.2",
+    "serve-static": "^1.14.1",
+    "tariff": "0.1.0"
+  },
+  "meteor": {
+    "mainModule": {
+      "client": "client/main.js",
+      "server": "server/main.js"
+    },
+    "testModule": "tests/main.js"
+  }
+}
