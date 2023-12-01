@@ -150,6 +150,7 @@ class EditorConnection {
       version: getVersion(editState),
       steps: steps ? steps.steps.map(s => s.toJSON()) : [],
       clientID: steps ? steps.clientID : 0,
+      cardId: '123',
     });
 
     this.run(POST(`${this.url}/events?cardId=123`, json, "application/json")).then(data => {

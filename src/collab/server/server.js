@@ -78,6 +78,10 @@ handle("GET", ["docs"], () => {
 
 // Output the current state of a document instance.
 handle("GET", ["docs", null], (id, req) => {
+  const baseURL = 'http://' + req.headers.host + '/';
+  const myURL = new URL(req.url, baseURL);
+  console.log('== docs: null ==', myURL.searchParams.get('cardId'));
+
   let inst = getInstance(id, reqIP(req))
   return Output.json({
     doc: inst.doc.toJSON(),
@@ -142,6 +146,10 @@ function outputEvents(inst, data) {
 // returns all events between a given version and the server's
 // current version of the document.
 handle("GET", ["docs", null, "events"], (id, req, resp) => {
+  const baseURL = 'http://' + req.headers.host + '/';
+  const myURL = new URL(req.url, baseURL);
+  console.log('== docs: events ==', myURL.searchParams.get('cardId'));
+
   let version = nonNegInteger(req.query.version);
   let inst = getInstance(id, reqIP(req));
   let data = inst.getEvents(version);
@@ -169,6 +177,7 @@ function reqIP(request) {
 
 // The event submission endpoint, which a client sends an event to.
 handle("POST", ['docs', null, 'events'], (data, id, req) => {
+  console.log('== docs: post ==', data.cardId);
   let version = nonNegInteger(data.version);
   let steps = data.steps.map(s => Step.fromJSON(schema, s));
   let result = getInstance(id, reqIP(req)).addEvents(version, steps, data.clientID);
