@@ -95,13 +95,14 @@ class EditorConnection {
 
   // Load the document from the server and start up
   start() {
-    this.run(GET(this.url)).then(data => {
+    this.run(GET(`${this.url}?cardId=123`)).then(data => {
       data = JSON.parse(data)
       this.backOff = 0
-      this.dispatch({type: "loaded",
-                     doc: schema.nodeFromJSON(data.doc),
-                     version: data.version,
-                     users: data.users,
+      this.dispatch({
+        type: "loaded",
+        doc: schema.nodeFromJSON(data.doc),
+        version: data.version,
+        users: data.users,
       })
     }, err => {
       // this.report.failure(err)
@@ -113,7 +114,7 @@ class EditorConnection {
   // for a new version of the document to be created if the client
   // is already up-to-date.
   poll() {
-    let query = "version=" + getVersion(this.state.edit);
+    let query = `version=${getVersion(this.state.edit)}&cardId=123`;
 
     this.run(GET(`${this.url}/events?${query}`)).then(data => {
       data = JSON.parse(data);
@@ -151,7 +152,7 @@ class EditorConnection {
       clientID: steps ? steps.clientID : 0,
     });
 
-    this.run(POST(`${this.url}/events`, json, "application/json")).then(data => {
+    this.run(POST(`${this.url}/events?cardId=123`, json, "application/json")).then(data => {
       this.backOff = 0;
       let tr = steps
           ? receiveTransaction(this.state.edit, steps.steps, repeat(steps.clientID, steps.steps.length))
