@@ -109,17 +109,19 @@ const instances = Object.create(null)
 let instanceCount = 0
 let maxCount = 20
 
-let saveFile = __dirname + "/../demo-instances.json", json
-if (process.argv.indexOf("--fresh") === -1) {
-  try {
-    json = JSON.parse(readFileSync(saveFile, "utf8"))
-  } catch (e) {}
-}
-
-if (json) {
-  for (let prop in json)
-    newInstance(prop, schema.nodeFromJSON(json[prop].doc))
-}
+// let saveFile = __dirname + "/../demo-instances.json", json
+// if (process.argv.indexOf("--fresh") === -1) {
+//   try {
+//     json = JSON.parse(readFileSync(saveFile, "utf8"))
+//   } catch (e) {}
+// }
+//
+// console.log('== json ==', json);
+//
+// if (json) {
+//   for (let prop in json)
+//     newInstance(prop, schema.nodeFromJSON(json[prop].doc))
+// }
 
 let saveTimeout = null, saveEvery = 1e4
 function scheduleSave() {
@@ -134,7 +136,8 @@ function doSave() {
       doc: instances[prop].doc.toJSON(),
       // comments: instances[prop].comments.comments}
     }
-  writeFile(saveFile, JSON.stringify(out), () => null)
+  console.log('== save ==');
+  // writeFile(saveFile, JSON.stringify(out), () => null)
 }
 
 function getInstance(id, ip) {
