@@ -25,23 +25,27 @@ for (let i = 2; i < process.argv.length; i++) {
 let moduleServer = new ModuleServer({
   root,
   transform(path, content) { return /\.json$/.test(path) ? content : tariff(content) }
-})
-let fileServer = serveStatic(root)
+});
+let fileServer = serveStatic(root);
 
 function transformPage(req, resp) {
-  let path = parseURL(req.url).pathname
-  let dir = /\/([^\.\/]+)?$/.exec(path)
-  if (dir) path = (dir[1] ? path : path.slice(0, -1)) + "/index.html"
+  let path = parseURL(req.url).pathname;
+  let dir = /\/([^\.\/]+)?$/.exec(path);
 
-  if (!/\.html$/.test(path)) return false
+  if (dir) {
+    path = (dir[1] ? path : path.slice(0, -1)) + "/index.html";
+  }
 
-  console.log('111111');
+  if (!/\.html$/.test(path)) {
+    return false;
+  }
 
-  const text = fs.readFileSync(__dirname + '/../public/collab.html', "utf8")
+  const text = fs.readFileSync(__dirname + '/../public/collab.html', "utf8");
 
   resp.writeHead(200, {"Content-Type": "text/html"});
-  resp.end(text)
-  return true
+  resp.end(text);
+
+  return true;
 }
 
 function maybeCollab(req, resp) {
@@ -50,10 +54,8 @@ function maybeCollab(req, resp) {
   if (backend !== url) {
     req.url = backend;
 
-    console.log('///////');
-
     if (handleCollabRequest(req, resp)) {
-      return true
+      return true;
     }
     req.url = url;
   }
@@ -65,11 +67,10 @@ createServer((req, resp) => {
   resp.setHeader('Access-Control-Allow-Origin', '*');
   resp.setHeader('Access-Control-Allow-Headers', 'origin, content-type, accept');
 
-  console.log(req.url);
   maybeCollab(req, resp) ||
     moduleServer.handleRequest(req, resp) ||
     transformPage(req, resp) ||
-    fileServer(req, resp)
-}).listen(port)
+    fileServer(req, resp);
+}).listen(port);
 
-console.log("Demo server listening on port " + port)
+console.log("Demo server listening on port " + port);
