@@ -35,11 +35,8 @@ class EditorConnection {
     let newEditState = null;
 
     if (action.type === "loaded") {
-      const div = document.createElement('div');
-      div.innerHTML = 'H';
-
       let editState = EditorState.create({
-        doc: DOMParser.fromSchema(schema).parse(div),
+        doc: action.doc,
         plugins: exampleSetup({schema}).concat([
           collab({version: action.version}),
         ]),
