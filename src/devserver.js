@@ -7,12 +7,12 @@ const {handleCollabRequest} = require("./collab/server/server")
 const serveStatic = require("serve-static")
 const tariff = require("tariff")
 
-let port = 8000
-const root = path.resolve(__dirname, "../public/")
+let port = 8000;
+const root = path.resolve(__dirname, "../public/");
 
 function usage(status) {
-  console.log("Usage: demoserver [--port PORT] [--help]")
-  process.exit(status)
+  console.log("Usage: demoserver [--port PORT] [--help]");
+  process.exit(status);
 }
 
 for (let i = 2; i < process.argv.length; i++) {
@@ -40,16 +40,17 @@ function transformPage(req, resp) {
     return false;
   }
 
-  const text = fs.readFileSync(__dirname + '/../public/collab.html', "utf8");
-
+  // actually this result is not handled on the client side.
+  // it can be executed when the request has "OPTIONS" method
   resp.writeHead(200, {"Content-Type": "text/html"});
-  resp.end(text);
+  resp.end('text');
 
   return true;
 }
 
 function maybeCollab(req, resp) {
-  let url = req.url, backend = url.replace(/\/collab-backend\b/, '');
+  let url = req.url,
+      backend = url.replace(/\/collab-backend\b/, '');
 
   if (backend !== url) {
     req.url = backend;

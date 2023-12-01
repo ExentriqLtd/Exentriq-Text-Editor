@@ -142,7 +142,6 @@ function outputEvents(inst, data) {
 // returns all events between a given version and the server's
 // current version of the document.
 handle("GET", ["docs", null, "events"], (id, req, resp) => {
-  console.log('???????');
   let version = nonNegInteger(req.query.version);
   let inst = getInstance(id, reqIP(req));
   let data = inst.getEvents(version);
