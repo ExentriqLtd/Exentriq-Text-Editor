@@ -47,10 +47,10 @@ function readStreamAsJSON(stream, callback) {
 // Register a server route.
 function handle(method, url, f) {
   router.add(method, url, (req, resp, ...args) => {
-    function finish() {
+    async function finish() {
       let output
       try {
-        output = f(...args, req, resp)
+        output = await f(...args, req, resp)
       } catch (err) {
         console.log(err.stack)
         output = new Output(err.status || 500, err.toString())
@@ -77,12 +77,12 @@ handle("GET", ["docs"], () => {
 });
 
 // Output the current state of a document instance.
-handle("GET", ["docs", null], (id, req) => {
+handle("GET", ["docs", null], async (id, req) => {
   const baseURL = 'http://' + req.headers.host + '/';
   const myURL = new URL(req.url, baseURL);
   const cardId = myURL.searchParams.get('cardId');
 
-  let inst = getInstance(cardId, reqIP(req))
+  let inst = await getInstance(cardId, reqIP(req))
   return Output.json({
     doc: inst.doc.toJSON(),
     version: inst.version,
@@ -145,13 +145,13 @@ function outputEvents(inst, data) {
 // An endpoint for a collaborative document instance which
 // returns all events between a given version and the server's
 // current version of the document.
-handle("GET", ["docs", null, "events"], (id, req, resp) => {
+handle("GET", ["docs", null, "events"], async (id, req, resp) => {
   const baseURL = 'http://' + req.headers.host + '/';
   const myURL = new URL(req.url, baseURL);
   const cardId = myURL.searchParams.get('cardId');
 
   let version = nonNegInteger(req.query.version);
-  let inst = getInstance(cardId, reqIP(req));
+  let inst = await getInstance(cardId, reqIP(req));
   let data = inst.getEvents(version);
 
   if (data === false) {
@@ -176,10 +176,11 @@ function reqIP(request) {
 }
 
 // The event submission endpoint, which a client sends an event to.
-handle("POST", ['docs', null, 'events'], (data, id, req) => {
+handle("POST", ['docs', null, 'events'], async (data, id, req) => {
   let version = nonNegInteger(data.version);
   let steps = data.steps.map(s => Step.fromJSON(schema, s));
-  let result = getInstance(data.cardId, reqIP(req)).addEvents(version, steps, data.clientID);
+  let inst = await getInstance(data.cardId, reqIP(req))
+  let result = inst.addEvents(version, steps, data.clientID);
 
   if (!result) {
     return new Output(409, "Version not current");

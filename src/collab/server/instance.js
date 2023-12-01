@@ -1,5 +1,6 @@
 const {readFileSync, writeFile} = require("fs");
 const {schema} = require("../schema");
+const db = require('./db');
 
 const MAX_STEP_HISTORY = 10000;
 
@@ -140,15 +141,15 @@ function doSave() {
   // writeFile(saveFile, JSON.stringify(out), () => null)
 }
 
-function getInstance(id, ip) {
-  let inst = instances[id] || newInstance(id)
+async function getInstance(id, ip) {
+  let inst = instances[id] || await newInstance(id)
   if (ip) inst.registerUser(ip)
   inst.lastActive = Date.now()
   return inst
 }
 exports.getInstance = getInstance
 
-function newInstance(id, doc) {
+async function newInstance(id, doc) {
   if (++instanceCount > maxCount) {
     let oldest = null
     for (let id in instances) {
@@ -159,7 +160,12 @@ function newInstance(id, doc) {
     delete instances[oldest.id]
     --instanceCount
   }
-  return instances[id] = new Instance(id, doc)
+  console.log('== id ==', id);
+  const result = await db().collection('entity').find({ _id: 'xAzPkcMqtj2QiJRfS' }).toArray();
+
+  // console.log('== result ==', result);
+
+  return instances[id] = await new Instance(id, doc);
 }
 
 function instanceInfo() {

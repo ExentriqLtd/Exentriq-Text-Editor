@@ -19,6 +19,8 @@ class State {
   }
 }
 
+const CARD_ID = 'xAzPkcMqtj2QiJRfS';
+
 class EditorConnection {
   constructor(url) {
     this.url = url;
@@ -95,7 +97,7 @@ class EditorConnection {
 
   // Load the document from the server and start up
   start() {
-    this.run(GET(`${this.url}?cardId=123`)).then(data => {
+    this.run(GET(`${this.url}?cardId=${CARD_ID}`)).then(data => {
       data = JSON.parse(data)
       this.backOff = 0
       this.dispatch({
@@ -114,7 +116,7 @@ class EditorConnection {
   // for a new version of the document to be created if the client
   // is already up-to-date.
   poll() {
-    let query = `version=${getVersion(this.state.edit)}&cardId=123`;
+    let query = `version=${getVersion(this.state.edit)}&cardId=${CARD_ID}`;
 
     this.run(GET(`${this.url}/events?${query}`)).then(data => {
       data = JSON.parse(data);
@@ -150,10 +152,10 @@ class EditorConnection {
       version: getVersion(editState),
       steps: steps ? steps.steps.map(s => s.toJSON()) : [],
       clientID: steps ? steps.clientID : 0,
-      cardId: '123',
+      cardId: CARD_ID,
     });
 
-    this.run(POST(`${this.url}/events?cardId=123`, json, "application/json")).then(data => {
+    this.run(POST(`${this.url}/events?cardId=${CARD_ID}`, json, "application/json")).then(data => {
       this.backOff = 0;
       let tr = steps
           ? receiveTransaction(this.state.edit, steps.steps, repeat(steps.clientID, steps.steps.length))
