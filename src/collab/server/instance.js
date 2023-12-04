@@ -151,6 +151,7 @@ function doSave() {
         { _id: inst.id },
         {
           $set: {
+            'meta.description': inst.doc.textContent,
             'meta.descriptionMeta.doc': inst.doc.toJSON(),
             'meta.descriptionMeta.version': inst.version,
           },

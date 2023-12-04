@@ -18,11 +18,12 @@ class State {
   }
 }
 
-const CARD_ID = 'xAzPkcMqtj2QiJRfS';
+const URL = "http://127.0.0.1:8888/collab-backend/docs/Example";
 
 class EditorConnection {
-  constructor(url) {
-    this.url = url;
+  constructor(id) {
+    this.id = id;
+    this.url = URL;
     this.state = new State(null, "start");
     this.request = null;
     this.backOff = 0;
@@ -35,25 +36,25 @@ class EditorConnection {
   dispatch(action) {
     let newEditState = null;
 
-    if (action.type === "loaded") {
+    if (action.type === 'loaded') {
       let editState = EditorState.create({
         doc: action.doc,
-        plugins: exampleSetup({schema}).concat([
-          collab({version: action.version}),
+        plugins: exampleSetup({ schema }).concat([
+          collab({ version: action.version }),
         ]),
       });
 
-      this.state = new State(editState, "poll")
+      this.state = new State(editState, "poll");
       this.poll();
-    } else if (action.type === "restart") {
-      this.state = new State(null, "start")
+    } else if (action.type === 'restart') {
+      this.state = new State(null, 'start');
       this.start();
     } else if (action.type === "poll") {
-      this.state = new State(this.state.edit, "poll")
+      this.state = new State(this.state.edit, "poll");
       this.poll();
     } else if (action.type === "recover") {
       if (action.error.status && action.error.status < 500) {
-        this.state = new State(null, null)
+        this.state = new State(null, null);
       } else {
         this.state = new State(this.state.edit, "recover");
         this.recover(action.error);
@@ -86,7 +87,7 @@ class EditorConnection {
       } else {
         this.setView(new EditorView(document.querySelector("#editor"), {
           state: this.state.edit,
-          dispatchTransaction: transaction => this.dispatch({type: "transaction", transaction}),
+          dispatchTransaction: transaction => this.dispatch({ type: 'transaction', transaction }),
         }));
       }
     } else {
@@ -96,15 +97,15 @@ class EditorConnection {
 
   // Load the document from the server and start up
   start() {
-    this.run(GET(`${this.url}?cardId=${CARD_ID}`)).then(data => {
-      data = JSON.parse(data)
-      this.backOff = 0
+    this.run(GET(`${this.url}?cardId=${this.id}`)).then(data => {
+      data = JSON.parse(data);
+      this.backOff = 0;
       this.dispatch({
         type: "loaded",
         doc: schema.nodeFromJSON(data.doc),
         version: data.version,
         users: data.users,
-      })
+      });
     }, err => {
       // this.report.failure(err)
     })
@@ -115,7 +116,7 @@ class EditorConnection {
   // for a new version of the document to be created if the client
   // is already up-to-date.
   poll() {
-    let query = `version=${getVersion(this.state.edit)}&cardId=${CARD_ID}`;
+    let query = `version=${getVersion(this.state.edit)}&cardId=${this.id}`;
 
     this.run(GET(`${this.url}/events?${query}`)).then(data => {
       data = JSON.parse(data);
@@ -151,10 +152,10 @@ class EditorConnection {
       version: getVersion(editState),
       steps: steps ? steps.steps.map(s => s.toJSON()) : [],
       clientID: steps ? steps.clientID : 0,
-      cardId: CARD_ID,
+      cardId: this.id,
     });
 
-    this.run(POST(`${this.url}/events?cardId=${CARD_ID}`, json, "application/json")).then(data => {
+    this.run(POST(`${this.url}/events?cardId=${this.id}`, json, "application/json")).then(data => {
       this.backOff = 0;
       let tr = steps
           ? receiveTransaction(this.state.edit, steps.steps, repeat(steps.clientID, steps.steps.length))
@@ -213,4 +214,4 @@ function repeat(val, n) {
   return result
 }
 
-window.connection = new EditorConnection("http://127.0.0.1:8888/collab-backend/docs/Example")
+export default EditorConnection;
