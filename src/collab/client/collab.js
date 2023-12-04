@@ -28,6 +28,7 @@ class EditorConnection {
     this.request = null;
     this.backOff = 0;
     this.view = null;
+    this.reqCtrl = new AbortController();
     this.dispatch = this.dispatch.bind(this);
     this.start();
   }
@@ -98,17 +99,16 @@ class EditorConnection {
   // Load the document from the server and start up
   start() {
     this.run(GET(`${this.url}?cardId=${this.id}`)).then(data => {
-      data = JSON.parse(data);
       this.backOff = 0;
       this.dispatch({
-        type: "loaded",
+        type: 'loaded',
         doc: schema.nodeFromJSON(data.doc),
         version: data.version,
         users: data.users,
       });
     }, err => {
       // this.report.failure(err)
-    })
+    });
   }
 
   // Send a request for events that have happened since the version
@@ -119,7 +119,6 @@ class EditorConnection {
     let query = `version=${getVersion(this.state.edit)}&cardId=${this.id}`;
 
     this.run(GET(`${this.url}/events?${query}`)).then(data => {
-      data = JSON.parse(data);
       this.backOff = 0;
 
       if (data.steps && (data.steps.length)) {

@@ -1,37 +1,24 @@
 // A simple wrapper for XHR.
-export function req(conf) {
-  let req = new XMLHttpRequest(), aborted = false
-  let result = new Promise((success, failure) => {
-    req.open(conf.method, conf.url, true)
-    req.addEventListener("load", () => {
-      if (aborted) return
-      if (req.status < 400) {
-        success(req.responseText)
-      } else {
-        let text = req.responseText
-        if (text && /html/.test(req.getResponseHeader("content-type"))) text = makePlain(text)
-        let err = new Error("Request failed: " + req.statusText + (text ? "\n\n" + text : ""))
-        err.status = req.status
-        failure(err)
-      }
+export function req({ url, ...options }) {
+  const reqCtrl = new AbortController();
+  let aborted = false;
+  const result = new Promise((resolve, reject) => {
+    return fetch(url, {
+      signal: reqCtrl.signal,
+      ...options,
     })
-    req.addEventListener("error", () => { if (!aborted) failure(new Error("Network error")) })
-    if (conf.headers) for (let header in conf.headers) req.setRequestHeader(header, conf.headers[header])
-    req.send(conf.body || null)
-  })
+        .then(result => result.json())
+        .then(resolve)
+        .catch(reject);
+  });
+
   result.abort = () => {
     if (!aborted) {
-      req.abort()
+      reqCtrl.abort();
       aborted = true
     }
   }
-  return result
-}
-
-function makePlain(html) {
-  var elt = document.createElement("div")
-  elt.innerHTML = html
-  return elt.textContent.replace(/\n[^]*|\s+$/g, "")
+  return result;
 }
 
 export function GET(url) {
