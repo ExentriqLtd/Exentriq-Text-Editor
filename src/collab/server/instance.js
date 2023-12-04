@@ -5,13 +5,13 @@ const MAX_STEP_HISTORY = 10000;
 
 // A collaborative editing document instance.
 class Instance {
-  constructor(id, doc) {
+  constructor(id, version, doc) {
     this.id = id;
     this.doc = doc || schema.node("doc", null, [schema.node("paragraph", null, [
       schema.text("This is a collaborative test document. Start editing to make it more interesting!")
     ])]);
     // The version number of the document instance.
-    this.version = 0;
+    this.version = version;
     this.steps = [];
     this.lastActive = Date.now();
     this.users = Object.create(null);
@@ -159,7 +159,6 @@ function doSave() {
       );
     }
   }
-  console.log('== save ==', out);
 }
 
 async function getInstance(id, ip) {
@@ -178,10 +177,19 @@ exports.getInstance = getInstance;
 async function newInstance(id) {
   // TODO: handle properly
   const result = await db().collection('entity')
-      .findOne({ _id: id }, { projection: { 'meta.descriptionMeta.doc': 1, } });
+    .findOne(
+      { _id: id },
+      {
+        projection: {
+          'meta.descriptionMeta.doc': 1,
+          'meta.descriptionMeta.version': 1,
+        }
+      }
+    );
   const doc = result?.meta.descriptionMeta?.doc;
+  const version = result?.meta.descriptionMeta?.version || 0;
 
-  return instances[id] = await new Instance(id, schema.nodeFromJSON(doc));
+  return instances[id] = await new Instance(id, version, schema.nodeFromJSON(doc));
 }
 
 function instanceInfo() {
@@ -195,15 +203,18 @@ function instanceInfo() {
 
 exports.instanceInfo = instanceInfo;
 
-// clean abandoned instances
-setInterval(() => {
-  for (const prop in instances) {
-    const inst = instances[prop];
-    const now = new Date().getTime();
+// TODO: clean up abandoned instances.
+// right now the problem is that when it's cleaned the new one is not picked up
 
-    // if the description was not updated for more then 5 minutes - remove it
-    if (inst.lastActive.getTime() + 5_000 * 60 < now) {
-      delete instances[prop];
-    }
-  }
-}, 5_000 * 60);
+// clean abandoned instances
+// setInterval(() => {
+//   for (const prop in instances) {
+//     const inst = instances[prop];
+//
+//     // if the description was not updated for more then 5 minutes - remove it
+//     if (inst.lastActive + 1_000 * 10 < Date.now()) {
+//       delete instances[prop];
+//       console.log('== deleted ==');
+//     }
+//   }
+// }, 1_000 * 10);
