@@ -7,9 +7,18 @@ export function req({ url, ...options }) {
       signal: reqCtrl.signal,
       ...options,
     })
-        .then(result => result.json())
-        .then(resolve)
-        .catch(reject);
+        .then(result => {
+            if (result.status < 400) {
+                return resolve(result.json());
+            } else {
+                let err = new Error("Request failed: " + result.statusText)
+                err.status = result.status
+                return reject(err);
+            }
+        })
+        .catch((error) => {
+            // error
+        });
   });
 
   result.abort = () => {
