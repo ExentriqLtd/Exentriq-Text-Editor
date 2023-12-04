@@ -3,13 +3,12 @@ import {Step} from "prosemirror-transform";
 import {EditorState} from "prosemirror-state";
 import {EditorView} from "prosemirror-view";
 import {collab, receiveTransaction, sendableSteps, getVersion} from "prosemirror-collab";
-import { DOMParser } from 'prosemirror-model';
 
 import {schema} from "../schema";
 import {GET, POST} from "./http";
 
 function badVersion(err) {
-  return err.status === 400 && /invalid version/i.test(err)
+  return err.status === 400 && /invalid version/i.test(err);
 }
 
 class State {
