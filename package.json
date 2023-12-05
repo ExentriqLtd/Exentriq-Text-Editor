@@ -23,7 +23,6 @@
     "express": "^4.18.2",
     "jquery": "^3.6.0",
     "meteor-node-stubs": "^1.2.1",
-    "moduleserve": "^0.8.5",
     "prosemirror-collab": "^1.0.0",
     "prosemirror-commands": "^1.0.0",
     "prosemirror-example-setup": "^1.0.0",
@@ -38,8 +37,7 @@
     "prosemirror-schema-list": "^1.0.0",
     "prosemirror-state": "^1.0.0",
     "prosemirror-transform": "^1.0.0",
-    "prosemirror-view": "^1.0.0",
-    "tariff": "^0.1.0"
+    "prosemirror-view": "^1.0.0"
   },
   "devDependencies": {
     "@rollup/plugin-commonjs": "^15.0.0",
@@ -52,8 +50,7 @@
     "mold-template": "^2.0.0",
     "punycode": "^1.4.0",
     "rollup": "^2.26.3",
-    "rollup-plugin-terser": "^7.0.2",
-    "serve-static": "^1.14.1"
+    "rollup-plugin-terser": "^7.0.2"
   },
   "meteor": {
     "mainModule": {

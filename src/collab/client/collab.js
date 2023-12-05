@@ -18,7 +18,7 @@ class State {
   }
 }
 
-const URL = "/collab-backend/docs/Example";
+const URL = "/api-collab/docs/Example";
 
 class EditorConnection {
   constructor(id) {
