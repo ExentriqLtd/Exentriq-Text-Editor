@@ -1,5 +1,5 @@
 const { schema } = require('../schema');
-const db = require('./db');
+const {Entity} = require('./db');
 
 const MAX_STEP_HISTORY = 10000;
 
@@ -131,7 +131,7 @@ function scheduleSave() {
   if (saveTimeout != null) {
     return;
   }
-  saveTimeout = setTimeout(doSave, saveEvery);
+  saveTimeout = setTimeout(Meteor.bindEnvironment(doSave), saveEvery);
 }
 
 function doSave() {
@@ -147,7 +147,7 @@ function doSave() {
       };
       inst.isUpdated = false;
 
-      db().collection('entity').updateOne(
+      Entity.update(
         { _id: inst.id },
         {
           $set: {
@@ -157,6 +157,7 @@ function doSave() {
           },
         },
       );
+      console.log('== saved ==');
     }
   }
 }
@@ -176,16 +177,14 @@ exports.getInstance = getInstance;
 
 async function newInstance(id) {
   // TODO: handle properly
-  const result = await db().collection('entity')
-    .findOne(
-      { _id: id },
-      {
-        projection: {
-          'meta.descriptionMeta.doc': 1,
-          'meta.descriptionMeta.version': 1,
-        }
-      }
-    );
+  const result = Entity.findOne({ _id: id }, {
+    fields: {
+      'meta.descriptionMeta.doc': 1,
+      'meta.descriptionMeta.version': 1,
+    },
+  });
+
+  console.log('== result ==', result);
   const doc = result?.meta.descriptionMeta?.doc;
   const version = result?.meta.descriptionMeta?.version || 0;
 

@@ -18,7 +18,7 @@ class State {
   }
 }
 
-const URL = "http://127.0.0.1:8888/collab-backend/docs/Example";
+const URL = "/collab-backend/docs/Example";
 
 class EditorConnection {
   constructor(id) {
